@@ -1,0 +1,14 @@
+Requires a 32-bit Python interpreter. Tested with Python 2.7. Windows Only.
+
+Furthermore, requires the following Python libraries:
+- pydbg
+- pydasm
+
+Precompiled binaries for pydbg and pydasm can be downloaded here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pydbg
+
+I haven't read the ToS of the game as I don't play it, but I'm pretty sure 
+using something like this is a BANNABLE  OFFENSE, so use at your own risk!
+
+If you want a stand-alone executable, try PyInstaller: http://www.pyinstaller.org/
+
+To change which items cause an alert, edit NotifyItems.py and add new items to the list _notifyItems: _notifyItems.append('Correct Item Name')
