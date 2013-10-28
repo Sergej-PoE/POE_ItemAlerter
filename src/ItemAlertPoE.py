@@ -78,9 +78,14 @@ class SoundPlayer(threading.Thread):
 
 class ItemAlert(object):
 
-    BP0 = 0x00235149 + 0x00400000
-    BP1 = 0x00235141 + 0x00400000
-    BP2 = 0x0023518B + 0x00400000
+    BP0 = 0x00256139 + 0x00400000 #MOV EDI, EAX
+    BP1 = 0x00256131 + 0x00400000 #PUSH EAX 
+    BP2 = 0x0025617B + 0x00400000 #MOV EAX,DWORD PTR [ESI+54]
+
+
+    #BP0 = 0x00235149 + 0x00400000
+    #BP1 = 0x00235141 + 0x00400000
+    #BP2 = 0x0023518B + 0x00400000
     
     number_of_uniques = 0
     number_of_rares = 0
