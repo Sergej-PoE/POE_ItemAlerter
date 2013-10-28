@@ -182,20 +182,19 @@ class ItemAlert(object):
                 buffer.nextDword()
                 buffer.nextDword()
 
-            unk5 = buffer.nextByte()
-            #print >>self.logFile, str.format('unk5 = {0}', unk5)
-            
-            if unk5 != 0:
-                print >>self.logFile, 'The following packet has an odd unk5 field:'
-                print >>self.logFile, self.dbg.hex_dump(map(lambda x: chr(x), packetData))
-                return
-
             unk5 = buffer.nextDword()
             #print >>self.logFile, str.format('unk5 = {0}', unk5)
-            
-            if unk5 != 0: buffer.nextDword()
 
-            unk6 = buffer.nextByte()
+            unk6 = buffer.nextDword()
+            #print >>self.logFile, str.format('unk6 = {0}', unk5)
+
+            unk7 = buffer.nextDword()
+            #print >>self.logFile, str.format('unk7 = {0}', unk5)
+
+            unk8 = buffer.nextByte()
+            #print >>self.logFile, str.format('unk8 = {0}', unk6)
+
+            quantity = buffer.nextByte()
             #print >>self.logFile, str.format('unk6 = {0}', unk6)
             
             itemId = buffer.nextDword()
