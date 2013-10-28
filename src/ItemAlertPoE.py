@@ -33,8 +33,8 @@ except:
     print 'Precompiled binaries can be downloaded from here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pydbg'
     sys.exit(1)
 
-ALERT_VERSION = '20130821'
-POE_VERSION = '0.11.5d'
+ALERT_VERSION = '20131026'
+POE_VERSION = '1.0.0d'
 DEBUG = False
 
 ALERT_RARES = True
@@ -140,9 +140,10 @@ class ItemAlert(object):
             buffer.setEndian(ByteBuffer.BIG_ENDIAN)
 
             if DEBUG:
+                print >>self.logFile, '---------------------------------'
                 print >>self.logFile, 'packet:'
                 print >>self.logFile, self.dbg.hex_dump(map(lambda x: chr(x), packetData))
-                print >>self.logFile, '---------------------------------'            
+                            
             
             id = buffer.nextByte()
             #print >>self.logFile, str.format('id = {0}', id)
@@ -186,16 +187,19 @@ class ItemAlert(object):
             #print >>self.logFile, str.format('unk5 = {0}', unk5)
 
             unk6 = buffer.nextDword()
-            #print >>self.logFile, str.format('unk6 = {0}', unk5)
+            #print >>self.logFile, str.format('unk6 = {0}', unk6)
 
-            unk7 = buffer.nextDword()
-            #print >>self.logFile, str.format('unk7 = {0}', unk5)
-
-            unk8 = buffer.nextByte()
-            #print >>self.logFile, str.format('unk8 = {0}', unk6)
+            unk7 = buffer.nextByte()
+            #print >>self.logFile, str.format('unk7 = {0}', unk7)
+            
+            unk8 = buffer.nextDword()
+            #print >>self.logFile, str.format('unk8 = {0}', unk8)
+			
+            if unk8 >= 2:
+                unk8 = buffer.nextDword()
 
             quantity = buffer.nextByte()
-            #print >>self.logFile, str.format('unk6 = {0}', unk6)
+            print >>self.logFile, str.format('quantity = {0}', quantity)
             
             itemId = buffer.nextDword()
             print >>self.logFile, str.format('itemId = {0}', itemId)
