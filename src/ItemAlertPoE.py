@@ -202,7 +202,7 @@ class ItemAlert(object):
                 unk8 = buffer.nextDword()
 
             quantity = buffer.nextByte()
-            print >>self.logFile, str.format('quantity = {0}', quantity)
+            #print >>self.logFile, str.format('quantity = {0}', quantity)
             
             itemId = buffer.nextDword()
             print >>self.logFile, str.format('itemId = {0}', itemId)
@@ -634,7 +634,11 @@ class ItemAlert(object):
                 
                 if DEBUG:
                     print >>self.logFile, str.format('Socket Setup = {0}', socketsetup)
+
+                if any(i in socketsetup for i in ('R-G-B','R-B-G','G-B-R','G-R-B','B-R-G','B-G-R')):
                 
+                    print Style.BRIGHT + Fore.RED + "R" + Style.BRIGHT + Fore.GREEN + "G" + Style.BRIGHT + Fore.BLUE + "B" + Style.BRIGHT + Fore.WHITE + str.format(': {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
+                    
                 msg = ""
                 if sockets == 5:
                     if sock_fragments == 1:
