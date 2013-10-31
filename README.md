@@ -20,6 +20,7 @@ SKU Note: I would strongly advise against using this program on a hardcore chara
 Sergej:
 * 5 Link and 6 Link detection
 * 6 socket detection
+* RGB Link detection
 * Gem detection based on quality (adjust value in line 239: if quality >= 5:)
 * Debug mode included, will log all properties of a drop. (DEBUG = True)
 * configurable alerts (Rares, Gems,Maps, Currency, values of gold amulets and rings)
@@ -38,8 +39,8 @@ old version:
 * Bugfix: Now works with no C:\Windows OS installations
 
 ## Installation instructions
-* Download and install Python 2.7 32 bit version! (<a href="http://www.python.org/ftp/python/2.7.4/python-2.7.4.msi">link</a>)
-* Download and install dependencies (<a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/gj5m29a8/pydbg-1.2.win32-py2.7.exe">link</a>)
+* Download and install Python 2.7 32 bit version! (<a href="http://www.python.org/ftp/python/2.7.6/python-2.7.6rc1.msi">link</a>)
+* Download and install dependencies (locate pydbg-1.2.win32-py2.7.exe here: (<a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/">link</a>)
 * Download and uncompress ItemAlertPoE anywhere (<a href="https://github.com/Sergej-PoE/POE_ItemAlerter/archive/master.zip">link</a>)
 * Run Path of Exile game client
 * Finally, double click ItemAlertPoE.py
