@@ -46,6 +46,8 @@ def isShieldItem(itemName):
 def isBeltItem(itemName):
     return True if not _filterItems else itemName in getBeltItems()
     
+def isQuiverItem(itemName):
+    return True if not _filterItems else itemName in getQuiverItems()
     
     
 def getNotifyItems():
@@ -74,6 +76,15 @@ def getShieldItems():
 
 def getBeltItems():
     return _beltItems
+
+def getQuiverItems():
+    return _quiverItems
+
+    
+_quiverItems = []
+keywords = ["Quivers"]
+for key in ItemList._items:
+    if any(x in ItemList._items[key][2] for x in keywords): _quiverItems.append(ItemList._items[key][1])
     
 _beltItems = []
 keywords = ["Belts"]
@@ -85,46 +96,37 @@ keywords = ["Shields"]
 for key in ItemList._items:
     if any(x in ItemList._items[key][2] for x in keywords): _shieldItems.append(ItemList._items[key][1])
 
-
-
     
-# Recommended patch by Rhynocerous.
 _notifyItems = []
 keywords = ["Map", "Currency"]
 for key in ItemList._items:
     if any(x in ItemList._items[key][2] for x in keywords): _notifyItems.append(ItemList._items[key][1])
 
-#python sucks
 _gemItems = []
 gemwords = ["Gems"]
 for key in ItemList._items:
     if any(x in ItemList._items[key][2] for x in gemwords): _gemItems.append(ItemList._items[key][1])
     
-#python sucks
 _flaskItems = []
 flaskwords = ["Flasks"]
 for key in ItemList._items:
     if any(x in ItemList._items[key][2] for x in flaskwords): _flaskItems.append(ItemList._items[key][1])
 
-#python sucks
 _armourItems = []
 armourwords = ["Armours", "Weapons"]
 for key in ItemList._items:
     if any(x in ItemList._items[key][2] for x in armourwords): _armourItems.append(ItemList._items[key][1])
 
-#python sucks    
 _currencyItems = []
 currencywords = ["Currency"]
 for key in ItemList._items:
     if any(x in ItemList._items[key][2] for x in currencywords): _currencyItems.append(ItemList._items[key][1])
 
-#python sucks
 _mapItems = []
 mapwords = ["Map"]
 for key in ItemList._items:
     if any(x in ItemList._items[key][2] for x in mapwords): _mapItems.append(ItemList._items[key][1])
 
-#python sucks
 _jewelleryItems = []
 jewellerywords = ["Rings", "Amulets"]
 for key in ItemList._items:

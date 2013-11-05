@@ -11,7 +11,7 @@ this stuff is worth it, you can buy me a beer in return.
 from os import system as OMGDONT
 from ModifierList import getModifier, getModifierName
 from ItemList import getItem, getItemName
-from NotifyItems import shouldNotify, isShieldItem, isBeltItem, isGemItem, isFlaskItem, isArmourItem, isCurrencyItem, isMapItem, isJewelleryItem, getSocketColor
+from NotifyItems import shouldNotify, isQuiverItem, isShieldItem, isBeltItem, isGemItem, isFlaskItem, isArmourItem, isCurrencyItem, isMapItem, isJewelleryItem, getSocketColor
 from ByteBuffer import ByteBuffer
 import ctypes
 import sys
@@ -33,7 +33,7 @@ except:
     print 'Precompiled binaries can be downloaded from here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pydbg'
     sys.exit(1)
 
-ALERT_VERSION = '20131026'
+ALERT_VERSION = '20131105'
 POE_VERSION = '1.0.0e'
 DEBUG = False
 
@@ -42,6 +42,33 @@ ALERT_GEMS = True
 ALERT_MAPS = True
 ALERT_CURR = True
 ALERT_JEW_VALUES = True
+
+
+# Configuration for which drops sounds are played
+
+#orbs
+SOUND_exalted = True
+SOUND_divine = True
+SOUND_gcp = True
+SOUND_regal = True
+SOUND_regret = True
+SOUND_chaos = True
+SOUND_blessed = True
+SOUND_scour = False
+SOUND_alc = False
+SOUND_fuse = False
+SOUND_chis = False
+SOUND_chance = False
+SOUND_jew = False
+SOUND_glass = False
+SOUND_mirror = True
+
+#uniques
+SOUND_uniques = True
+
+#6 socket / 5-Link / 6-Link
+SOUND_slots = True
+
 
 RUN_START = 0
 RUN_END = 0
@@ -54,6 +81,13 @@ number_of_orbs = 0
 number_of_maps = 0
 
 
+class PlaySoundCraftingItem(threading.Thread):
+    def run(self):
+        winsound.PlaySound(r'sounds\craftingpoe.wav', winsound.SND_FILENAME)
+
+class PlaySoundholy(threading.Thread):
+    def run(self):
+        winsound.PlaySound(r'sounds\holyshit.wav', winsound.SND_FILENAME)        
 
 class PlaySoundWorker(threading.Thread):
     def run(self):
@@ -61,7 +95,7 @@ class PlaySoundWorker(threading.Thread):
         
 class PlaySoundUnique(threading.Thread):
     def run(self):
-        winsound.PlaySound(r'sounds\unique.wav', winsound.SND_FILENAME)
+        winsound.PlaySound(r'sounds\legendarypoe.wav', winsound.SND_FILENAME)
         
 class PlaySoundSuperiorGem(threading.Thread):
     def run(self):
@@ -216,13 +250,52 @@ class ItemAlert(object):
             if isCurrencyItem(itemName):
                 print Fore.WHITE + str.format('CUR: {0}',itemName)
                 number_of_orbs += 1
-                
-                #Specified items (like gems)
-                sPlayer = SoundPlayer()
-                if itemId == 0xC04F5629:
-                    sPlayer.start('exaltedorb.wav');
-                if itemId == 0x07A992EB:
-                    sPlayer.start('gemcuttersprism.wav');
+
+                if itemId == 0xC04F5629 and SOUND_exalted == True: # Exalted Orb
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0x80047CFD and SOUND_divine == True: # Divine Orb
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0x07A992EB and SOUND_gcp == True: # Gemcutter's Prism
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0xD8BD4F5D and SOUND_regal == True: # Regal Orb
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0x9B4B42A5 and SOUND_regret == True: # Orb of Regret
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0x7353DDF9 and SOUND_chaos == True: # Chaos Orb
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0x2D8E7632 and SOUND_blessed == True: # Blessed Orb
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0x7F0EF637 and SOUND_scour == True: # Orb of Scouring
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0x9110493F and SOUND_alc == True: # Orb of Alchemy
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0xC71BF58D and SOUND_fuse == True: # Orb of Fusing
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0xDC217297 and SOUND_chis == True: # Cartographer's Chisel
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0xC5732C85 and SOUND_chance == True: # Orb of Chance
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0xDD917991 and SOUND_jew == True: # Jeweller's Orb
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0xDD74C4BF and SOUND_glass == True: # Glassblower's Bauble
+                    crafting_drop = PlaySoundCraftingItem()
+                    crafting_drop.start()
+                if itemId == 0x79C23B15 and SOUND_mirror == True: # Mirror of Kalandra
+                    crafting_drop = PlaySoundholy()
+                    crafting_drop.start()
                 
                 return
                 
@@ -289,14 +362,34 @@ class ItemAlert(object):
                 if rarity == 3:
                 
                     print Fore.YELLOW + str.format('UNI BELT: {0}, rarity: {1}',itemName,rarity)
-                    unique = PlaySoundUnique()
-                    unique.start()
+                    if SOUND_uniques == True:
+                        unique = PlaySoundUnique()
+                        unique.start()
 
                     number_of_uniques += 1
             
                 elif rarity == 2 and ALERT_RARES == True:
                 
                     print Style.BRIGHT + Fore.YELLOW + str.format('BELT: {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
+
+                print >>self.logFile, '---------------------------------'
+                
+                return
+
+            if isQuiverItem(itemName):
+                
+                if rarity == 3:
+                
+                    print Fore.YELLOW + str.format('UNI Quiver: {0}, rarity: {1}',itemName,rarity)
+                    if SOUND_uniques == True:
+                        unique = PlaySoundUnique()
+                        unique.start()
+
+                    number_of_uniques += 1
+            
+                elif rarity == 2 and ALERT_RARES == True:
+                
+                    print Style.BRIGHT + Fore.YELLOW + str.format('QUIV: {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
 
                 print >>self.logFile, '---------------------------------'
                 
@@ -352,8 +445,9 @@ class ItemAlert(object):
                             
                     else:
                         print Fore.YELLOW + str.format('UNI JEW: {0}, rarity: {1}',itemName,rarity)
-                        unique = PlaySoundUnique()
-                        unique.start()
+                        if SOUND_uniques == True:
+                            unique = PlaySoundUnique()
+                            unique.start()
                         
                         number_of_uniques += 1
 
@@ -427,27 +521,35 @@ class ItemAlert(object):
                                         actual=buffer.nextDword()
                     
                     else:
-                        _skipnext = int(buffer.nextDword())
+                        _implicitmods = int(buffer.nextDword())
                         
-                        if _skipnext >= 1:
-                            actual=buffer.nextDword()
+                        if _implicitmods == 2:
+                        
+                            if DEBUG:
+                                print >>self.logFile, str.format('_implicitmods = {0}', _implicitmods)
+            
+                        elif _implicitmods == 1:
+
+                            _implicitmod = buffer.nextDword()
+                            if DEBUG:
+                                print >>self.logFile, str.format('_implicitmod = {0}', _implicitmod)
+                            
+                            _impl_mod_values = int(buffer.nextByte())
+                            if DEBUG:
+                                print >>self.logFile, str.format('_impl_mod_values = {0}', _impl_mod_values)
+                            
+                            
+                            for i in range(0,_impl_mod_values):
+                                # needs to be worked out
+                                _mod_value = int(buffer.nextDword())
                                 
-                            _skipnext = int(buffer.nextByte())
-
-                            if _skipnext >= 1:
-                                actual=buffer.nextDword()
-
-                                _skipnext = int(buffer.nextByte())
-
-                                if _skipnext >= 1:
-                                    actual=buffer.nextDword()
-                        else:
+                        unk_mod=int(buffer.nextByte())
                         
-                            _skipnext = int(buffer.nextByte())            
-
-                            if _skipnext >= 1:                        
-                                for i in range(0,_skipnext):
-                                    actual=buffer.nextDword()
+                        if unk_mod >=0:
+                            for i in range(0,unk_mod):
+                                # needs to be worked out
+                                _mod_value = int(buffer.nextDword())
+                            
                     
                     number_of_mods = int(buffer.nextDword())
 
@@ -635,9 +737,18 @@ class ItemAlert(object):
                 if DEBUG:
                     print >>self.logFile, str.format('Socket Setup = {0}', socketsetup)
 
-                if any(i in socketsetup for i in ('R-G-B','R-B-G','G-B-R','G-R-B','B-R-G','B-G-R')):
+                rare_alerted = False 
+                    
+                if any(i in socketsetup for i in ('R-G-B','R-B-G','G-B-R','G-R-B','B-R-G','B-G-R','R-B-B-G','G-R-R-B','G-B-B-R','B-G-G-R','B-R-R-G','R-G-G-B')):
                 
-                    print Style.BRIGHT + Fore.RED + "R" + Style.BRIGHT + Fore.GREEN + "G" + Style.BRIGHT + Fore.BLUE + "B" + Style.BRIGHT + Fore.WHITE + str.format(': {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
+                    if rarity == 0:
+                        print Style.BRIGHT + Fore.RED + "R" + Style.BRIGHT + Fore.GREEN + "G" + Style.BRIGHT + Fore.BLUE + "B" + Style.BRIGHT + Fore.WHITE + str.format(': {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
+                    if rarity == 1:
+                        print Style.BRIGHT + Fore.RED + "R" + Style.BRIGHT + Fore.GREEN + "G" + Style.BRIGHT + Fore.BLUE + "B" + Style.BRIGHT + Fore.BLUE + str.format(': {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
+                    if rarity == 2:
+                        print Style.BRIGHT + Fore.RED + "R" + Style.BRIGHT + Fore.GREEN + "G" + Style.BRIGHT + Fore.BLUE + "B" + Style.BRIGHT + Fore.YELLOW + str.format(': {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
+                        rare_alerted = True 
+                        
                     
                 msg = ""
                 if sockets == 5:
@@ -656,17 +767,24 @@ class ItemAlert(object):
                 
                 if msg != "":
                     print >>self.logFile, msg
-                    print Style.BRIGHT + Fore.MAGENTA + str.format('{5}: {0}, rarity: {1}, ilvl: {2}, quality: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup, msg)
+                    print Style.BRIGHT + Fore.MAGENTA + str.format('{5}: {0}, rarity: {1}, ilvl: {2}, qual: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup, msg)
 
+                    if SOUND_slots == True:
+                        sound = PlaySoundholy()
+                        sound.start()
+
+                    
                 if rarity == 3:
                     print >>self.logFile, 'UNIQUE !'
                     number_of_uniques += 1
                     
-                    print Fore.YELLOW + str.format('UNI: {0}, rarity: {1}, ilvl: {2}, quality: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup)
-                    unique = PlaySoundUnique()
-                    unique.start()
+                    print Fore.YELLOW + str.format('UNI: {0}, rarity: {1}, ilvl: {2}, qual: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup)
+                    
+                    if SOUND_uniques == True:
+                        unique = PlaySoundUnique()
+                        unique.start()
 
-                if rarity == 2 and ALERT_RARES == True:
+                if rarity == 2 and ALERT_RARES == True and rare_alerted == False:
                 
                     print Style.BRIGHT + Fore.YELLOW + str.format('RARE: {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
                     
@@ -731,9 +849,9 @@ def checkVersion():
         sys.exit(1)
 
 def main():
-    OMGDONT('title Path of Exile ItemAlert by sku')
+    OMGDONT('title Path of Exile ItemAlert by Sarge, original by sku')
     checkVersion()
-    print Fore.RED + str.format('Starting ItemAlert {0} for Path of Exile {1} by sku', ALERT_VERSION, POE_VERSION)
+    print Fore.RED + str.format('Starting ItemAlert {0} for Path of Exile {1} by Sarge, original by sku', ALERT_VERSION, POE_VERSION)
     with ItemAlert() as alerter: alerter.run()
 
 if __name__ == '__main__':
