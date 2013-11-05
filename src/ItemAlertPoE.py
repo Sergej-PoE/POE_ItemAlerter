@@ -33,12 +33,13 @@ except:
     print 'Precompiled binaries can be downloaded from here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pydbg'
     sys.exit(1)
 
-ALERT_VERSION = '20131105'
+ALERT_VERSION = '20131106'
 POE_VERSION = '1.0.0e'
 DEBUG = False
 
 ALERT_RARES = True
 ALERT_GEMS = True
+ALERT_SPECIALGEMS = True
 ALERT_MAPS = True
 ALERT_CURR = True
 ALERT_JEW_VALUES = True
@@ -69,6 +70,10 @@ SOUND_uniques = True
 #6 socket / 5-Link / 6-Link
 SOUND_slots = True
 
+# special gems
+SOUND_specialgems = True
+specialGems = '0x4C32EEEE,0x26856055'
+gemqual = 5
 
 RUN_START = 0
 RUN_END = 0
@@ -311,12 +316,18 @@ class ItemAlert(object):
 
                 actual = buffer.nextByte()
                 quality = int(buffer.nextDword())
-                #print >>self.logFile, str.format('quality = {0}', quality)
-                if quality >= 5:
+                if DEBUG:
+                    print >>self.logFile, str.format('Gem quality = {0}', quality)
+                if quality >= gemqual:
                     print Fore.CYAN + str.format('GEM: {0}, quality: {1}',itemName,quality)
-                    #unique = PlaySoundUnique()
-                    #unique.start()
 
+                if itemID in specialGems and ALERT_SPECIALGEMS:
+                    print Fore.CYAN + str.format('Special GEM: {0}, quality: {1}',itemName,quality)
+                    
+                    if SOUND_specialgems == True:
+                        gem_drop = PlaySoundholy()
+                        gem_drop.start()
+                    
                 print >>self.logFile, '---------------------------------'
                 return
 
@@ -769,7 +780,7 @@ class ItemAlert(object):
                     print >>self.logFile, msg
                     print Style.BRIGHT + Fore.MAGENTA + str.format('{5}: {0}, rarity: {1}, ilvl: {2}, qual: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup, msg)
 
-                    if SOUND_slots == True:
+                    if SOUND_slots == True and msg != "6-SLOT":
                         sound = PlaySoundholy()
                         sound.start()
 
@@ -811,7 +822,7 @@ class ItemAlert(object):
         print >>self.logFile, str.format('"pathofexile.exe" processes found: {0!s}', clients)
         pid = None
         if not clients or len(clients) == 0: print 'No "pathofexile.exe" process found.'
-        elif len(clients) > 1: print 'Found more than one "pathofexile.exe" process.'
+        #elif len(clients) > 1: print 'Found more than one "pathofexile.exe" process.'
         else: pid = clients[0]
         return pid
 
