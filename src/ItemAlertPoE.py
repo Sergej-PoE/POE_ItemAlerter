@@ -33,8 +33,8 @@ except:
     print 'Precompiled binaries can be downloaded from here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pydbg'
     sys.exit(1)
 
-ALERT_VERSION = '20131106'
-POE_VERSION = '1.0.0e'
+ALERT_VERSION = '20131107'
+POE_VERSION = '1.0.0f'
 DEBUG = False
 
 ALERT_RARES = True
@@ -117,13 +117,18 @@ class SoundPlayer(threading.Thread):
 
 class ItemAlert(object):
 
-    #BP0 = 0x00256139 + 0x00400000 #MOV EDI, EAX
-    #BP1 = 0x00256131 + 0x00400000 #PUSH EAX 
-    #BP2 = 0x0025617B + 0x00400000 #MOV EAX,DWORD PTR [ESI+54]
+    BP0 = 0x00257239 + 0x00400000
+    BP1 = 0x00257231 + 0x00400000
+    BP2 = 0x0025727b + 0x00400000
 
-    BP0 = 0x00257109 + 0x00400000 #MOV EDI, EAX
-    BP1 = 0x00257101 + 0x00400000 #PUSH EAX 
-    BP2 = 0x0025714B + 0x00400000 #MOV EAX,DWORD PTR [ESI+54]
+    #BP0 = 0x00257239 + 0x00400000
+    #BP1 = 0x00257231 + 0x00400000
+    #BP2 = 0x0025727b + 0x00400000
+
+    # 1.0.0e
+    #BP0 = 0x00257109 + 0x00400000 #MOV EDI, EAX
+    #BP1 = 0x00257101 + 0x00400000 #PUSH EAX 
+    #BP2 = 0x0025714B + 0x00400000 #MOV EAX,DWORD PTR [ESI+54]
 
     #BP0 = 0x00235149 + 0x00400000
     #BP1 = 0x00235141 + 0x00400000
@@ -783,11 +788,9 @@ class ItemAlert(object):
                     if SOUND_slots == True and msg != "6-SLOT":
                         sound = PlaySoundholy()
                         sound.start()
-
-                    
+                
                 if rarity == 3:
-                    print >>self.logFile, 'UNIQUE !'
-                    number_of_uniques += 1
+                    print >>self.logFile, 'UNIQUE !'                    number_of_uniques += 1
                     
                     print Fore.YELLOW + str.format('UNI: {0}, rarity: {1}, ilvl: {2}, qual: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup)
                     
