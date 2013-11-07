@@ -33,9 +33,9 @@ except:
     print 'Precompiled binaries can be downloaded from here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pydbg'
     sys.exit(1)
 
-ALERT_VERSION = '20131107'
-POE_VERSION = '1.0.0f'
-DEBUG = False
+ALERT_VERSION = '20131108'
+POE_VERSION = '1.0.0g'
+DEBUG = True
 
 ALERT_RARES = True
 ALERT_GEMS = True
@@ -326,7 +326,7 @@ class ItemAlert(object):
                 if quality >= gemqual:
                     print Fore.CYAN + str.format('GEM: {0}, quality: {1}',itemName,quality)
 
-                if itemID in specialGems and ALERT_SPECIALGEMS:
+                if str(hex(itemId)) in specialGems and ALERT_SPECIALGEMS == True:
                     print Fore.CYAN + str.format('Special GEM: {0}, quality: {1}',itemName,quality)
                     
                     if SOUND_specialgems == True:
