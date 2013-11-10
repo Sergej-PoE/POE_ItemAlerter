@@ -48,6 +48,7 @@ ALERT_JEW_VALUES = True
 # Configuration for which drops sounds are played
 
 #orbs
+SOUND_eternal = True
 SOUND_exalted = True
 SOUND_divine = True
 SOUND_gcp = True
@@ -55,10 +56,10 @@ SOUND_regal = True
 SOUND_regret = True
 SOUND_chaos = True
 SOUND_blessed = True
-SOUND_scour = False
-SOUND_alc = False
-SOUND_fuse = False
-SOUND_chis = False
+SOUND_scour = True
+SOUND_alc = True
+SOUND_fuse = True
+SOUND_chis = True
 SOUND_chance = False
 SOUND_jew = False
 SOUND_glass = False
@@ -67,8 +68,11 @@ SOUND_mirror = True
 #uniques
 SOUND_uniques = True
 
-#6 socket / 5-Link / 6-Link
+#5-Link / 6-Link
 SOUND_slots = True
+
+#6 socket 
+SOUND_6sockets = True
 
 # special gems
 SOUND_specialgems = True
@@ -85,6 +89,9 @@ number_of_rares = 0
 number_of_orbs = 0
 number_of_maps = 0
 
+class PlaySound6Sockets(threading.Thread):
+    def run(self):
+        winsound.PlaySound(r'sounds\payback_time.wav', winsound.SND_FILENAME)
 
 class PlaySoundCraftingItem(threading.Thread):
     def run(self):
@@ -121,6 +128,7 @@ class ItemAlert(object):
     BP1 = 0x00257231 + 0x00400000
     BP2 = 0x0025727b + 0x00400000
 
+    # 1.0.0f and 1.0.0g
     #BP0 = 0x00257239 + 0x00400000
     #BP1 = 0x00257231 + 0x00400000
     #BP2 = 0x0025727b + 0x00400000
@@ -249,63 +257,76 @@ class ItemAlert(object):
             #print >>self.logFile, str.format('quantity = {0}', quantity)
             
             itemId = buffer.nextDword()
-            print >>self.logFile, str.format('itemId = {0}', itemId)
+            print >>self.logFile, 'itemId = ' + "0x%x"%(itemId&0xffffffff)
 
             #remaining = buffer.getRemainingBytes()
             
             itemName = getItemName(itemId)
             print >>self.logFile, str.format('itemName = {0}', itemName)
-            
+
+            if itemName == "unknown item":
+                
+                if DEBUG:
+                    print Style.BRIGHT + Fore.RED + 'UNKNOWN ITEM:' + "0x%x"%(itemId&0xffffffff)
+
+                print >>self.logFile, '---------------------------------'
+                return
+                
 
             if isCurrencyItem(itemName):
-                print Fore.WHITE + str.format('CUR: {0}',itemName)
-                number_of_orbs += 1
+            
+                if itemId !=0x50880BAF and itemId != 0x4F2B00ED: 
+                    print Fore.WHITE + str.format('CUR: {0}',itemName)
+                    number_of_orbs += 1
 
-                if itemId == 0xC04F5629 and SOUND_exalted == True: # Exalted Orb
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0x80047CFD and SOUND_divine == True: # Divine Orb
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0x07A992EB and SOUND_gcp == True: # Gemcutter's Prism
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0xD8BD4F5D and SOUND_regal == True: # Regal Orb
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0x9B4B42A5 and SOUND_regret == True: # Orb of Regret
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0x7353DDF9 and SOUND_chaos == True: # Chaos Orb
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0x2D8E7632 and SOUND_blessed == True: # Blessed Orb
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0x7F0EF637 and SOUND_scour == True: # Orb of Scouring
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0x9110493F and SOUND_alc == True: # Orb of Alchemy
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0xC71BF58D and SOUND_fuse == True: # Orb of Fusing
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0xDC217297 and SOUND_chis == True: # Cartographer's Chisel
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0xC5732C85 and SOUND_chance == True: # Orb of Chance
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0xDD917991 and SOUND_jew == True: # Jeweller's Orb
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0xDD74C4BF and SOUND_glass == True: # Glassblower's Bauble
-                    crafting_drop = PlaySoundCraftingItem()
-                    crafting_drop.start()
-                if itemId == 0x79C23B15 and SOUND_mirror == True: # Mirror of Kalandra
-                    crafting_drop = PlaySoundholy()
-                    crafting_drop.start()
+                    if itemId == 0x61B2F5ED and SOUND_eternal == True: # Eternal Orb
+                        crafting_drop = PlaySoundholy()
+                        crafting_drop.start()
+                    if itemId == 0xC04F5629 and SOUND_exalted == True: # Exalted Orb
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0x80047CFD and SOUND_divine == True: # Divine Orb
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0x07A992EB and SOUND_gcp == True: # Gemcutter's Prism
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0xD8BD4F5D and SOUND_regal == True: # Regal Orb
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0x9B4B42A5 and SOUND_regret == True: # Orb of Regret
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0x7353DDF9 and SOUND_chaos == True: # Chaos Orb
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0x2D8E7632 and SOUND_blessed == True: # Blessed Orb
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0x7F0EF637 and SOUND_scour == True: # Orb of Scouring
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0x9110493F and SOUND_alc == True: # Orb of Alchemy
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0xC71BF58D and SOUND_fuse == True: # Orb of Fusing
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0xDC217297 and SOUND_chis == True: # Cartographer's Chisel
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0xC5732C85 and SOUND_chance == True: # Orb of Chance
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0xDD917991 and SOUND_jew == True: # Jeweller's Orb
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0xDD74C4BF and SOUND_glass == True: # Glassblower's Bauble
+                        crafting_drop = PlaySoundCraftingItem()
+                        crafting_drop.start()
+                    if itemId == 0x79C23B15 and SOUND_mirror == True: # Mirror of Kalandra
+                        crafting_drop = PlaySoundholy()
+                        crafting_drop.start()
                 
                 return
                 
@@ -783,12 +804,23 @@ class ItemAlert(object):
                 
                 if msg != "":
                     print >>self.logFile, msg
-                    print Style.BRIGHT + Fore.MAGENTA + str.format('{5}: {0}, rarity: {1}, ilvl: {2}, qual: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup, msg)
+
+                    if rarity == 0:
+                        print Style.BRIGHT + Fore.MAGENTA + msg + Style.BRIGHT + Fore.WHITE + str.format(' : {0}, rarity: {1}, ilvl: {2}, qual: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup)
+                    if rarity == 1:
+                        print Style.BRIGHT + Fore.MAGENTA + msg + Style.BRIGHT + Fore.BLUE + str.format(' : {0}, rarity: {1}, ilvl: {2}, qual: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup)
+                    if rarity == 2:
+                        print Style.BRIGHT + Fore.MAGENTA + msg + Style.BRIGHT + Fore.YELLOW + str.format(' : {0}, rarity: {1}, ilvl: {2}, qual: {3}, sockets: {4}',itemName,rarity,itemlevel,quality, socketsetup)
+                        rare_alerted = True 
 
                     if SOUND_slots == True and msg != "6-SLOT":
                         sound = PlaySoundholy()
                         sound.start()
-                
+                    else:
+                        if SOUND_6sockets == True:
+                            sound = PlaySound6Sockets()
+                            sound.start()
+                        
                 if rarity == 3:
                     print >>self.logFile, 'UNIQUE !'                    number_of_uniques += 1
                     
