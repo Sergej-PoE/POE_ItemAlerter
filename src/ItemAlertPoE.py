@@ -33,8 +33,8 @@ except:
     print 'Precompiled binaries can be downloaded from here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pydbg'
     sys.exit(1)
 
-ALERT_VERSION = '20131113'
-POE_VERSION = '1.0.0g'
+ALERT_VERSION = '20131114'
+POE_VERSION = '1.0.1b'
 DEBUG = False
 
 ALERT_RARES = True
@@ -135,9 +135,9 @@ class SoundPlayer(threading.Thread):
 
 class ItemAlert(object):
 
-    BP0 = 0x00257239 + 0x00400000
-    BP1 = 0x00257231 + 0x00400000
-    BP2 = 0x0025727b + 0x00400000
+    BP0 = 0x0025b6a9 + 0x00400000
+    BP1 = 0x0025b6a1 + 0x00400000
+    BP2 = 0x0025b6eb + 0x00400000
 
     # 1.0.0f and 1.0.0g
     #BP0 = 0x00257239 + 0x00400000
