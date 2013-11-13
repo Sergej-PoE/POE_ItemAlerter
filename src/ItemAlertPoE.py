@@ -33,9 +33,9 @@ except:
     print 'Precompiled binaries can be downloaded from here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pydbg'
     sys.exit(1)
 
-ALERT_VERSION = '20131108'
+ALERT_VERSION = '20131113'
 POE_VERSION = '1.0.0g'
-DEBUG = True
+DEBUG = False
 
 ALERT_RARES = True
 ALERT_GEMS = True
@@ -44,6 +44,7 @@ ALERT_MAPS = True
 ALERT_CURR = True
 ALERT_JEW_VALUES = True
 
+#SHOW_OWN_ITEMS_ONLY = True
 
 # Configuration for which drops sounds are played
 
@@ -79,6 +80,10 @@ SOUND_specialgems = True
 specialGems = '0x4C32EEEE,0x26856055'
 gemqual = 5
 
+#maps
+SOUND_maps = True
+
+
 RUN_START = 0
 RUN_END = 0
 
@@ -88,6 +93,12 @@ number_of_uniques = 0
 number_of_rares = 0
 number_of_orbs = 0
 number_of_maps = 0
+
+
+
+class PlaySoundMaps(threading.Thread):
+    def run(self):
+        winsound.PlaySound(r'sounds\legendarypoe.wav', winsound.SND_FILENAME)
 
 class PlaySound6Sockets(threading.Thread):
     def run(self):
@@ -250,16 +261,19 @@ class ItemAlert(object):
             unk8 = buffer.nextDword()
             #print >>self.logFile, str.format('unk8 = {0}', unk8)
 			
+            
             if unk8 >= 2:
+
                 unk8 = buffer.nextDword()
 
-            quantity = buffer.nextByte()
-            #print >>self.logFile, str.format('quantity = {0}', quantity)
+            dropped_by_entity = buffer.nextByte()
+            if DEBUG:
+                print >>self.logFile, str.format('dropped by player or mob : {0}', dropped_by_entity)
             
             itemId = buffer.nextDword()
             print >>self.logFile, 'itemId = ' + "0x%x"%(itemId&0xffffffff)
 
-            #remaining = buffer.getRemainingBytes()
+            remaining = buffer.getRemainingBytes()
             
             itemName = getItemName(itemId)
             print >>self.logFile, str.format('itemName = {0}', itemName)
@@ -271,7 +285,6 @@ class ItemAlert(object):
 
                 print >>self.logFile, '---------------------------------'
                 return
-                
 
             if isCurrencyItem(itemName):
             
@@ -390,6 +403,10 @@ class ItemAlert(object):
                 print Style.BRIGHT + Fore.BLUE + str.format('MAP: {0}, rarity: {1}, itemlevel: {2}, quality: {3}',itemName,rarity,itemlevel,quality)
 
                 print >>self.logFile, '---------------------------------'
+                if SOUND_maps == True:
+                    map = PlaySoundMaps()
+                    map.start()
+
                 
                 number_of_maps += 1
                 return
