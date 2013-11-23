@@ -42,3 +42,14 @@ class ByteBuffer(object):
         dword = self.data[self.position:self.position+4]
         self.position += 4
         return makeDword(dword, self.endian if not endian else endian)
+        
+    def getString(self, strlength):
+        stringlength = strlength
+        returnstring = ''
+        assert self.getRemainingBytes() >= stringlength
+
+        for ii in range(0,stringlength*2):
+            char = self.nextByte()
+            if char != 0:
+                returnstring = returnstring + chr(char)
+        return returnstring
