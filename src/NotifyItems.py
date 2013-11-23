@@ -48,7 +48,21 @@ def isBeltItem(itemName):
     
 def isQuiverItem(itemName):
     return True if not _filterItems else itemName in getQuiverItems()
+
+def isSearchItem(itemName,itemClass):
+    return True if not _filterItems else itemName in getSearchItems(itemClass)
     
+
+    
+    
+def getSearchItems(itemClass):
+
+    _searchItems = []
+    keywords = itemClass
+    for key in ItemList._items:
+        if any(x in ItemList._items[key][2] for x in keywords): _searchItems.append(ItemList._items[key][1])
+
+    return _searchItems
     
 def getNotifyItems():
     return _notifyItems
