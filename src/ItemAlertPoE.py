@@ -11,7 +11,7 @@ this stuff is worth it, you can buy me a beer in return.
 from os import system as OMGDONT
 from ModifierList import getModifier, getModifierName
 from ItemList import getItem, getItemName
-from NotifyItems import shouldNotify, isQuiverItem, isShieldItem, isBeltItem, isGemItem, isFlaskItem, isArmourItem, isCurrencyItem, isMapItem, isJewelleryItem, getSocketColor
+from NotifyItems import shouldNotify, isSearchItem, isQuiverItem, isShieldItem, isBeltItem, isGemItem, isFlaskItem, isArmourItem, isCurrencyItem, isMapItem, isJewelleryItem, getSocketColor
 from ByteBuffer import ByteBuffer
 import ctypes
 import sys
@@ -33,18 +33,40 @@ except:
     print 'Precompiled binaries can be downloaded from here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pydbg'
     sys.exit(1)
 
-ALERT_VERSION = '20131114'
-POE_VERSION = '1.0.1b'
-DEBUG = False
+ALERT_VERSION = '20131123'
+POE_VERSION = '1.0.1c'
 
+################################################################################
+# Configuration for itemalerter
+
+# Debug settings
+DEBUG = False
+DEBUG_ALL = False
+
+# Steam or standalone version of Path of Exile
+STEAM = False
+
+# what to alert for
 ALERT_RARES = True
 ALERT_GEMS = True
 ALERT_SPECIALGEMS = True
 ALERT_MAPS = True
 ALERT_CURR = True
 ALERT_JEW_VALUES = True
+ALERT_RACE = True
 
+# wip
 #SHOW_OWN_ITEMS_ONLY = True
+
+
+#Search special item, do NOT set to True, the requiered ilvl doesnt alwayws work
+SEARCH_special = False
+
+special_class = 'BootsStr'
+special_mod = 'Armour'
+special_ilvl = 28
+special_rlvl = 24
+
 
 # Configuration for which drops sounds are played
 
@@ -83,6 +105,16 @@ gemqual = 5
 #maps
 SOUND_maps = True
 
+# RGB linked item
+SOUND_rgb = True
+
+# Race specific links
+SOUND_race = True
+race_sockets = ('R-R-R', 'G-G-G')
+
+############################################################################
+# do not change anything below 
+############################################################################
 
 RUN_START = 0
 RUN_END = 0
@@ -94,7 +126,13 @@ number_of_rares = 0
 number_of_orbs = 0
 number_of_maps = 0
 
+class PlaySoundRace(threading.Thread):
+    def run(self):
+        winsound.PlaySound(r'sounds\lets_rock.wav', winsound.SND_FILENAME)
 
+class PlaySoundRGB(threading.Thread):
+    def run(self):
+        winsound.PlaySound(r'sounds\bitchin.wav', winsound.SND_FILENAME)
 
 class PlaySoundMaps(threading.Thread):
     def run(self):
@@ -135,10 +173,36 @@ class SoundPlayer(threading.Thread):
 
 class ItemAlert(object):
 
-    BP0 = 0x0025b6a9 + 0x00400000
-    BP1 = 0x0025b6a1 + 0x00400000
-    BP2 = 0x0025b6eb + 0x00400000
+    if not STEAM:
 
+        BP0 = 0x0025c949 + 0x00400000
+        BP1 = 0x0025c941 + 0x00400000
+        BP2 = 0x0025c98b + 0x00400000
+
+    else:
+    
+        BP0 = 0x0025D7C9  + 0x00400000
+        BP1 = 0x0025D7C1  + 0x00400000
+        BP2 = 0x0025D80B  + 0x00400000
+    
+
+    # list of old offesets
+    
+    # 1.0.1c Steam 
+    #BP0 = 0x0025D7C9  + 0x00400000
+    #BP1 = 0x0025D7C1  + 0x00400000
+    #BP2 = 0x0025D80B  + 0x00400000
+
+    # 1.0.1c 
+    #BP0 = 0x0025c949 + 0x00400000
+    #BP1 = 0x0025c941 + 0x00400000
+    #BP2 = 0x0025c98b + 0x00400000
+    
+    # 1.0.1a and 1.0.1b
+    #BP0 = 0x0025b6a9 + 0x00400000
+    #BP1 = 0x0025b6a1 + 0x00400000
+    #BP2 = 0x0025b6eb + 0x00400000
+    
     # 1.0.0f and 1.0.0g
     #BP0 = 0x00257239 + 0x00400000
     #BP1 = 0x00257231 + 0x00400000
@@ -191,7 +255,64 @@ class ItemAlert(object):
     def beforeDemanglingPacket(self, dbg):
         self.lastPacketBufferAddress = dbg.get_register('eax')
         return DBG_CONTINUE
+
+
+    def playerJoined(self,packetData): 
+    
+        try:
         
+            buffer = ByteBuffer(packetData)
+            buffer.setEndian(ByteBuffer.BIG_ENDIAN)
+
+            id = buffer.nextByte()
+            unk1 = buffer.nextDword()
+            unk2 = buffer.nextByte()
+            player_name_len = buffer.nextByte()
+            
+            playername = buffer.getString(player_name_len)
+            
+            print Fore.WHITE + str.format('Player joined the area: {0}',playername)
+            return
+            
+        except:pass
+        
+    def playerLeft(self,packetData): 
+    
+        try:
+        
+            buffer = ByteBuffer(packetData)
+            buffer.setEndian(ByteBuffer.BIG_ENDIAN)
+
+            id = buffer.nextByte()
+            unk1 = buffer.nextDword()
+            unk2 = buffer.nextByte()
+            player_name_len = buffer.nextByte()
+            
+            playername = buffer.getString(player_name_len)
+            
+            print Fore.WHITE + str.format('Player left the area: {0}',playername)
+            return
+            
+        except:pass
+
+    def playerChat(self, packetData): 
+    
+        try:
+            
+            buffer = ByteBuffer(packetData)
+            buffer.setEndian(ByteBuffer.BIG_ENDIAN)
+
+            id = buffer.nextByte()
+            
+            unk1 = buffer.nextByte()
+            
+            player_name_len = buffer.nextByte()
+            
+            playername = buffer.getString(player_name_len)
+            #print Fore.WHITE + str.format('Player is chatting: {0}',playername)
+            return
+        
+        except: pass
 
     def parseWorldItemPacket(self, packetData):
     
@@ -205,34 +326,28 @@ class ItemAlert(object):
             buffer = ByteBuffer(packetData)
             buffer.setEndian(ByteBuffer.BIG_ENDIAN)
 
-            if DEBUG:
-                print >>self.logFile, '---------------------------------'
-                print >>self.logFile, 'packet:'
-                print >>self.logFile, self.dbg.hex_dump(map(lambda x: chr(x), packetData))
-                            
-            
             id = buffer.nextByte()
             #print >>self.logFile, str.format('id = {0}', id)
-            
+
             objectType = buffer.nextDword()
             #print >>self.logFile, str.format('ObjectType = {0}', objectType)
-            
+
             unk1 = buffer.nextDword()
             #print >>self.logFile, str.format('unk1 = {0}', unk1)
-            
+
             unk2 = buffer.nextByte()
             #print >>self.logFile, str.format('unk2 = {0}', unk2)
-            
+
             if unk2 != 0: 
                 print >>self.logFile, 'The following packet has an odd unk2 field:'
                 print >>self.logFile, self.dbg.hex_dump(map(lambda x: chr(x), packetData))
                 return
 
-            x = buffer.nextDword()
-            #print >>self.logFile, str.format('x = {0}', x)
+            xcoord = buffer.nextDword()
+            #print >>self.logFile, str.format('x coord = {0}', xcoord)
             
-            y = buffer.nextDword()
-            #print >>self.logFile, str.format('y = {0}', y)
+            ycoord = buffer.nextDword()
+            #print >>self.logFile, str.format('y coord = {0}', ycoord)
             
             rot = buffer.nextDword()
             #print >>self.logFile, str.format('rot = {0}', rot)
@@ -273,7 +388,7 @@ class ItemAlert(object):
             itemId = buffer.nextDword()
             print >>self.logFile, 'itemId = ' + "0x%x"%(itemId&0xffffffff)
 
-            remaining = buffer.getRemainingBytes()
+            #remaining = buffer.getRemainingBytes()
             
             itemName = getItemName(itemId)
             print >>self.logFile, str.format('itemName = {0}', itemName)
@@ -341,6 +456,7 @@ class ItemAlert(object):
                         crafting_drop = PlaySoundholy()
                         crafting_drop.start()
                 
+                print >>self.logFile, '---------------------------------'
                 return
                 
             actual = buffer.nextByte()
@@ -371,6 +487,19 @@ class ItemAlert(object):
                 return
 
             req_lvl = buffer.nextDword()
+            if DEBUG:
+                print >>self.logFile, str.format('req lvl = {0}', req_lvl)
+                
+            if SEARCH_special:
+
+                if isSearchItem(itemName,special_class):    
+
+                    if  itemlevel >= special_ilvl and special_rlvl <= req_lvl:
+                    
+                        sound = PlaySound6Sockets()
+                        sound.start()
+                        print Style.BRIGHT + Fore.RED + str.format('Special Item: {0}, itemlevel: {1}',itemName,itemlevel)
+            
             actual = buffer.nextDword()
             actual = buffer.nextByte()
             rarity = buffer.nextDword()
@@ -403,11 +532,11 @@ class ItemAlert(object):
                 print Style.BRIGHT + Fore.BLUE + str.format('MAP: {0}, rarity: {1}, itemlevel: {2}, quality: {3}',itemName,rarity,itemlevel,quality)
 
                 print >>self.logFile, '---------------------------------'
+
                 if SOUND_maps == True:
                     map = PlaySoundMaps()
                     map.start()
-
-                
+       
                 number_of_maps += 1
                 return
 
@@ -792,7 +921,24 @@ class ItemAlert(object):
                     print >>self.logFile, str.format('Socket Setup = {0}', socketsetup)
 
                 rare_alerted = False 
+
+                if ALERT_RACE:
+                
+                    if any(i in socketsetup for i in race_sockets):
                     
+                        if rarity == 0:
+                            print Style.BRIGHT + Fore.RED + "Race item" + Style.BRIGHT + Fore.WHITE + str.format(': {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
+                        if rarity == 1:
+                            print Style.BRIGHT + Fore.RED + "Race item" + Style.BRIGHT + Fore.BLUE + str.format(': {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
+                        if rarity == 2:
+                            print Style.BRIGHT + Fore.RED + "Race item" + Style.BRIGHT + Fore.YELLOW + str.format(': {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
+                            rare_alerted = True 
+
+                        if SOUND_race:
+                            sound = PlaySoundRace()
+                            sound.start()
+
+                
                 if any(i in socketsetup for i in ('R-G-B','R-B-G','G-B-R','G-R-B','B-R-G','B-G-R','R-B-B-G','G-R-R-B','G-B-B-R','B-G-G-R','B-R-R-G','R-G-G-B')):
                 
                     if rarity == 0:
@@ -802,7 +948,11 @@ class ItemAlert(object):
                     if rarity == 2:
                         print Style.BRIGHT + Fore.RED + "R" + Style.BRIGHT + Fore.GREEN + "G" + Style.BRIGHT + Fore.BLUE + "B" + Style.BRIGHT + Fore.YELLOW + str.format(': {0}, rarity: {1}, itemlevel: {2}',itemName,rarity,itemlevel)
                         rare_alerted = True 
-                        
+
+                    if SOUND_rgb:
+                        sound = PlaySoundRGB()
+                        sound.start()
+
                     
                 msg = ""
                 if sockets == 5:
@@ -864,22 +1014,75 @@ class ItemAlert(object):
         if self.lastPacketBufferAddress != 0 and self.lastPacketSize > 1:
             packetData = dbg.read_process_memory(self.lastPacketBufferAddress, self.lastPacketSize)
             packetData = map(lambda x: ord(x), packetData)
+            if DEBUG_ALL:
+                print >>self.logFile, packetData[0:4]
+                if packetData[0:2] != [0x45, 0x00] and packetData[0:3] != [0xf1, 0x00, 0x00]:
+                    print >>self.logFile, '_____________ new packet ________________________________________________________________________________________________________'
+                    print >>self.logFile, str.format('Packet size: {0}',self.lastPacketSize)
+                    print >>self.logFile, packetData
+                    print >>self.logFile, self.dbg.hex_dump(map(lambda x: chr(x), packetData))
+                    print >>self.logFile, '__________________________________________________________________________________________________________________________________'
             for i in range(self.lastPacketSize):
                 if packetData[i:i+5] == [0xf0, 0x54, 0x92, 0x8a, 0x3a]:
+                    if DEBUG:
+        
+                        print >>self.logFile, '---------------------------------'                    
+                        print >>self.logFile, 'loot packet:'
+                        print >>self.logFile, self.dbg.hex_dump(map(lambda x: chr(x), packetData[i:]))
+                        
                     self.parseWorldItemPacket(packetData[i:])
+        
+            # player joined the area packet
+            if packetData[0:4] == [0x08, 0x75, 0xff, 0x00]:
+                if DEBUG_ALL:
+                    self.playerJoined(packetData)
+
+            # player left the area packet
+            if packetData[0:4] == [0x08, 0x74, 0xff, 0x00]:
+                if DEBUG_ALL:
+                    self.playerLeft(packetData)
+
+            # player chat packet
+            if packetData[0:2] == [0x07, 0x00]:
+                if DEBUG_ALL:
+                    self.playerChat(packetData)
+        
         return DBG_CONTINUE
 
     def getProcessId(self):
-        clients = [x[0] for x in self.dbg.enumerate_processes() if x[1].lower() == 'pathofexile.exe']
-        print >>self.logFile, str.format('"pathofexile.exe" processes found: {0!s}', clients)
+    
+        if not STEAM:
+            clients = [x[0] for x in self.dbg.enumerate_processes() if x[1].lower() == 'pathofexile.exe']
+            print >>self.logFile, str.format('"pathofexile.exe" processes found: {0!s}', clients)
+        else:
+            clients = [x[0] for x in self.dbg.enumerate_processes() if x[1].lower() == 'pathofexilesteam.exe']
+            print >>self.logFile, str.format('"pathofexilesteam.exe" processes found: {0!s}', clients)
+        
         pid = None
-        if not clients or len(clients) == 0: print 'No "pathofexile.exe" process found.'
-        #elif len(clients) > 1: print 'Found more than one "pathofexile.exe" process.'
-        else: pid = clients[0]
+        
+        if not STEAM:
+            if not clients or len(clients) == 0: 
+                print 'No "pathofexile.exe" process found.'
+            elif len(clients) > 1: 
+                print 'Found more than one "pathofexile.exe" process.'
+            else: 
+                pid = clients[0]
+        else:
+            if not clients or len(clients) == 0: 
+                print 'No "pathofexilesteam.exe" process found.'
+            elif len(clients) > 1: 
+                print 'Found more than one "pathofexilesteam.exe" process.'
+            else: 
+                pid = clients[0]
+        
         return pid
 
     def getBaseAddress(self):
-        base = [x[1] for x in self.dbg.enumerate_modules() if x[0].lower() == 'pathofexile.exe'][0]
+        if not STEAM:
+            base = [x[1] for x in self.dbg.enumerate_modules() if x[0].lower() == 'pathofexile.exe'][0]
+        else:
+            base = [x[1] for x in self.dbg.enumerate_modules() if x[0].lower() == 'pathofexilesteam.exe'][0]
+            
         print >>self.logFile, str.format('Base address: 0x{0:08x}', base)
         return base
 
@@ -912,9 +1115,18 @@ def checkVersion():
         sys.exit(1)
 
 def main():
-    OMGDONT('title Path of Exile ItemAlert by Sarge, original by sku')
+    
+    if not STEAM:
+        OMGDONT('title Path of Exile ItemAlert by Sarge, original by sku')
+    else:
+        OMGDONT('title Path of Exile (Steam) ItemAlert by Sarge, original by sku')
+        
     checkVersion()
-    print Fore.RED + str.format('Starting ItemAlert {0} for Path of Exile {1} by Sarge, original by sku', ALERT_VERSION, POE_VERSION)
+    
+    if not STEAM:
+        print Fore.RED + str.format('Starting ItemAlert {0} for Path of Exile {1} by Sarge, original by sku', ALERT_VERSION, POE_VERSION)
+    else:
+        print Fore.RED + str.format('Starting ItemAlert {0} for Path of Exile (Steam) {1} by Sarge, original by sku', ALERT_VERSION, POE_VERSION)
     with ItemAlert() as alerter: alerter.run()
 
 if __name__ == '__main__':
